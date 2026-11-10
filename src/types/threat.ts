@@ -60,3 +60,41 @@ export interface ScanHistoryItem {
   threatCategory: string;
   timestamp: string;
 }
+
+export interface ThreatFlag {
+  title: string;
+  description: string;
+  status: 'danger' | 'safe' | 'warning';
+}
+
+export interface ThreatReport {
+  id: string;
+  target: string;
+  type: ThreatType;
+  riskScore: number;
+  severity: 'critical' | 'safe';
+  category: string;
+  summary: string;
+  domainAge: string;
+  sslStatus: string;
+  ipAddress: string;
+  scanTime: string;
+  flags: ThreatFlag[];
+  recommendations: string[];
+  createdAt?: string;
+  userId?: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  role?: string;
+  createdAt: string;
+}
+
+export interface AuthResponse {
+  user: User | null;
+  token?: string;
+  error?: string;
+}
