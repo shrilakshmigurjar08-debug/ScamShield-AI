@@ -1,0 +1,19 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/update-threat-feeds",
+      "schedule": "0 */6 * * *"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/scan/url",
+      "destination": "/api/verify-url"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
+}
+
