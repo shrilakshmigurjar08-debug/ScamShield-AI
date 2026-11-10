@@ -15,9 +15,6 @@ import {
   ArrowRight,
   Clock,
   Sparkles,
-  Settings,
-  X,
-  Key,
 } from 'lucide-react';
 
 export interface ThreatFlag {
@@ -58,12 +55,6 @@ export default function App() {
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
-  
-  // Settings modal for API keys
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [geminiKey, setGeminiKey] = useState<string>(localStorage.getItem('scamshield_gemini_key') || '');
-  const [vtKey, setVtKey] = useState<string>(localStorage.getItem('scamshield_vt_key') || '');
-  const [aiProvider, setAiProvider] = useState<'gemini' | 'openai'>('gemini');
 
   // Initial active report
   const [report, setReport] = useState<ThreatReport>({
@@ -111,13 +102,6 @@ export default function App() {
     },
   });
 
-  const saveSettings = () => {
-    localStorage.setItem('scamshield_gemini_key', geminiKey);
-    localStorage.setItem('scamshield_vt_key', vtKey);
-    setSettingsOpen(false);
-    setActionNotice('API configurations saved successfully');
-  };
-
   // Quick fill samples
   const handleQuickFill = (type: 'phishing' | 'clean') => {
     if (activeTab === 'url') {
@@ -155,7 +139,6 @@ export default function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             url: urlToScan,
-            vtApiKey: vtKey || undefined,
           }),
         });
 
@@ -207,8 +190,6 @@ export default function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             text: textToScan,
-            apiKey: geminiKey || undefined,
-            provider: aiProvider,
           }),
         });
 
@@ -363,14 +344,6 @@ export default function App() {
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-zinc-300">Live Forensics & NLP</span>
             </div>
-            <span className="text-zinc-700">|</span>
-            <button
-              onClick={() => setSettingsOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 transition cursor-pointer"
-            >
-              <Settings className="w-3.5 h-3.5 text-zinc-400" />
-              <span>API Config</span>
-            </button>
           </div>
         </div>
       </header>
@@ -522,7 +495,7 @@ export default function App() {
               />
               <div className="flex items-center justify-between">
                 <span className="text-[11px] text-zinc-500 font-mono">
-                  {inputVal.length} chars • AI NLP Semantic Engine ({geminiKey ? 'Gemini 1.5' : 'Smart Local Heuristic ML'})
+                  {inputVal.length} chars • AI NLP Semantic Engine (Google Gemini Active)
                 </span>
                 <button
                   onClick={handleAnalyze}
@@ -835,93 +808,6 @@ export default function App() {
           </div>
         </section>
       </main>
-
-      {/* API Key Configuration Modal */}
-      {settingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-xl bg-zinc-900 border border-zinc-800 p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <div className="flex items-center gap-2 text-zinc-100 font-semibold text-sm">
-                <Key className="w-4 h-4 text-cyan-400" />
-                <span>API & Threat Intelligence Keys</span>
-              </div>
-              <button
-                onClick={() => setSettingsOpen(false)}
-                className="text-zinc-500 hover:text-zinc-200 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Optionally configure your personal API keys to unlock live Google Gemini / OpenAI LLM text reasoning and VirusTotal threat database lookups.
-            </p>
-
-            <div className="space-y-4 text-xs">
-              <div>
-                <label className="block text-zinc-300 font-medium mb-1">
-                  Gemini API Key (Google AI Studio)
-                </label>
-                <input
-                  type="password"
-                  value={geminiKey}
-                  onChange={(e) => setGeminiKey(e.target.value)}
-                  placeholder="AIzaSy..."
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-zinc-100 font-mono focus:outline-none focus:border-cyan-500"
-                />
-                <span className="text-[10px] text-zinc-500 mt-1 block">
-                  Enables true generative NLP deception extraction.
-                </span>
-              </div>
-
-              <div>
-                <label className="block text-zinc-300 font-medium mb-1">
-                  VirusTotal API Key (Optional)
-                </label>
-                <input
-                  type="password"
-                  value={vtKey}
-                  onChange={(e) => setVtKey(e.target.value)}
-                  placeholder="Enter 64-char hex key..."
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-zinc-100 font-mono focus:outline-none focus:border-cyan-500"
-                />
-                <span className="text-[10px] text-zinc-500 mt-1 block">
-                  Queries 70+ cybersecurity vendor engines live.
-                </span>
-              </div>
-
-              <div>
-                <label className="block text-zinc-300 font-medium mb-1">
-                  AI Provider Preference
-                </label>
-                <select
-                  value={aiProvider}
-                  onChange={(e: any) => setAiProvider(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-zinc-100 font-mono focus:outline-none focus:border-cyan-500"
-                >
-                  <option value="gemini">Google Gemini 1.5 Flash</option>
-                  <option value="openai">OpenAI GPT-4o Mini</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-800">
-              <button
-                onClick={() => setSettingsOpen(false)}
-                className="px-3 py-1.5 rounded text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveSettings}
-                className="px-4 py-1.5 rounded text-xs font-semibold bg-cyan-500 hover:bg-cyan-400 text-zinc-950 transition cursor-pointer"
-              >
-                Save Configuration
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <footer className="border-t border-zinc-800 py-6 text-center text-xs text-zinc-500 font-mono">
